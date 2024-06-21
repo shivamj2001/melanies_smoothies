@@ -2,6 +2,8 @@
 import streamlit as st
 # from snowflake.snowpark.context import get_active_session
 from snowflake.snowpark.functions import col
+import requests
+
 
 
 # Write directly to the app
@@ -30,35 +32,32 @@ ingredients_list = st.multiselect(
 
 
 if ingredients_list:
- # st.write(ingredients_list)
- # st.text(ingredients_list)
 
-  ingredients_string = ''
-  #name_on_order = ''
+      ingredients_string = ''
 
-  for fruits_chosen in ingredients_list:
-    ingredients_string += fruits_chosen + ' '
+      for fruits_chosen in ingredients_list:
+             ingredients_string += fruits_chosen + ' '
+             fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+             fv_df = st.dataframe(data=fruityvice_response.json(), use_container_width=True)
 
-  st.write(ingredients_string)
+       st.write(ingredients_string)
 
-  my_insert_stmt = """ insert into smoothies.public.orders(ingredients,name_on_order)  
-            values ('""" + ingredients_string + """','""" + name_on_order + """')"""
+       my_insert_stmt = """ insert into smoothies.public.orders(ingredients,name_on_order)  
+              values ('""" + ingredients_string + """','""" + name_on_order + """')"""
 
   #st.write(my_insert_stmt)
   #st.stop
 
-  time_to_insert = st.button('Submit Order')  
+      time_to_insert = st.button('Submit Order')  
 
-  if time_to_insert:
-     session.sql(my_insert_stmt).collect()
+      if time_to_insert:
+          session.sql(my_insert_stmt).collect()
     
-     st.success(f'Your Smoothie is ordered,{name_on_order}!', icon="✅")
+          st.success(f'Your Smoothie is ordered,{name_on_order}!', icon="✅")
 
 
-import requests
-fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
-# st.text(fruityvice_response.json())
-fv_df = st.dataframe(data=fruityvice_response.json(), use_container_width=True)
+#fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+#fv_df = st.dataframe(data=fruityvice_response.json(), use_container_width=True)
 
 
 
